@@ -91,14 +91,14 @@ def part2_2():
     # x = [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1, 1]
     x = [1, 2, 3, 4, 5, 6, 5, 4, 3]
     h = [1, 4, 6, 4, 1]
+    x = np.pad(x, (0, 3), 'constant')  # pad x
 
     # Direct convolution
     y = np.convolve(x, h)
     print('\nDirect Convolution(t): ', y)
 
     # Point-by-point multiplication: pad, fft, pbp, ifft
-    x = np.pad(x, (0, 3), 'constant')  # pad x
-    # xh = np.pad(x, (0, 3), 'constant') pad h
+    # h = np.pad(x, (0, 3), 'constant')  # pad h
     x01 = np.fft.fft(x, 16)  # fft xp
     h01 = np.fft.fft(h, 16)  # fft hp
     y01 = abs(np.multiply(x01, h01))  # point-by-point multiplication
@@ -110,15 +110,18 @@ def part2_2():
     print('FFT(t) clean: ', np.real(y03))
     print('FFT(w): ', y01)
 
-    # diff = mse(abs(y02), abs(y01))
+    diff = mse(abs(y02), abs(y01))
+    print(diff)
 
 def part2_3():
     import numpy as np
     from numpy import random
+    from sklearn.metrics import mean_squared_error as mse
     import time
 
     x = random.rand(10500)
     h = random.rand(1024)
+    x = np.pad(x, (0, 16384+1024-(10500+1024-1)), 'constant')
 
     tic = time.time()
     y = np.convolve(x, h)
@@ -128,17 +131,18 @@ def part2_3():
     t = toc - tic
 
     tic = time.time()
-    x = np.pad(x, (0, 16384-10500), 'constant')
-    h = np.pad(h, (0, 16384-1024), 'constant')
-    x01 = np.fft.fft(x, 16384)
-    h01 = np.fft.fft(h, 16384)
+    # x = np.pad(x, (0, 16384-10500), 'constant')
+    x01 = np.fft.fft(x, 16384+1024)
+    h01 = np.fft.fft(h, 16384+1024)
     y01 = abs(np.multiply(x01, h01))
     y03 = np.fft.ifft(y01)
     toc = time.time()
 
-    print('FFT: ', y)
+    print('FFT: ', y03)
     print('time: ', toc - tic)
-    print('time saved: ', np.abs(t - (toc - tic)))
+    print('time saved: ', (t - (toc - tic)))
+    diff = mse(abs(y), abs(y03))
+    print(diff)
 
 if __name__ == '__main__':
     # part1()
