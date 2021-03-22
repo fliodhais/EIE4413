@@ -198,11 +198,12 @@ def part2_4():
     yr = np.fft.ifft(Yr)
     # print('y= ', yr)
     yf = []
-    yf.extend(yr[0][:2048 - 1023])
-    # print('len(yf)=', len(yf))
-    # print('yf)=', yf)
+    yf.extend(yr[0][0:1025])
+    print('len(yf)=', len(yf))
+    print('yf)=', yf)
     for i in range(0, 99):
-        yf.extend(yr[i][1023:]+yr[i+1][:2048-1023])
+        yf.extend(yr[i][1025:2048]+yr[i+1][0:1023])
+        yf.extend(yr[i+1][1023:1025])
         # print('yf[', i, ']=', yf)
     yf.extend(yr[99][1025:])
     toc = time.time()
@@ -246,17 +247,19 @@ def part2_4clean():
     Yr = np.multiply(X, H)
     yr = np.fft.ifft(Yr)
     yf = []
-    yf.extend(yr[0][:2048 - 1023])
+    yf.extend(yr[0][0:1025])
+    print('len(yf)=', len(yf))
+    print('yf)=', yf)
     for i in range(0, 99):
-        yf.extend(yr[i][1023:]+yr[i+1][:2048-1023])
+        yf.extend(yr[i][1025:2048] + yr[i + 1][0:1023])
+        yf.extend(yr[i + 1][1023:1025])
     yf.extend(yr[99][1025:])
     toc = time.time()
-    diff = mse(y, np.abs(yf))
+    diff = mse(np.real(y), np.real(yf))
     print('convolution by section time(s): ', toc - tic)
-    # print('convolution by section(t): ', yf)
     print('time saved by FFT(s): ', t - toc + tic)
     print('mse(DC, FFT): ', diff)
-    if diff < 10:
+    if diff < 1:
         print("results similar")
 
   # testing function
